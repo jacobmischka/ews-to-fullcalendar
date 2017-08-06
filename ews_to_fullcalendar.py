@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from exchangelib import DELEGATE, ServiceAccount, Account, Configuration, EWSDateTime, EWSTimeZone
+from exchangelib import (DELEGATE, ServiceAccount, Account, Configuration,
+	EWSDateTime, EWSTimeZone, Message, ExtendedProperty)
 from dotenv import load_dotenv, find_dotenv
 import os
 
@@ -17,6 +18,9 @@ def get_account():
 	return Account(primary_smtp_address=EMAIL, config=config,
 		autodiscover=False, access_type=DELEGATE)
 
+def get_request(account):
+	return account.inbox.filter(subject='')[0]
+
 def get_events(account):
 	# FIXME
 	tz = EWSTimeZone.timezone('America/Chicago')
@@ -29,11 +33,30 @@ def get_ical_event(event):
 
 def get_fullcalendar_event(event):
 	# TODO
+	pass
 
 def main():
 	account = get_account()
-	events = get_events(account)
-	print(get_ical_event(events[0]))
+	Message.register('content_class', PidNameContentClass)
+	Message.register('provider_guid', PidLidSharingProviderGuid)
+	r = get_request(account)
+	print(r.content_class)
+	print(r.provider_guid)
+
+
+class PidNameContentClass(ExtendedProperty):
+	property_set_id = '00020386-0000-0000-c000-000000000046'
+	property_name = 'Content-class'
+	property_type = 'String'
+
+class PidLidSharingProviderGuid(ExtendedProperty):
+	property_set_id = '00062040-0000-0000-C000-000000000046'
+	property_name = '0x8A01'
+	property_type = 'Binary'
+
+# class PidLidSharingProviderName(ExtendedProperty):
+# 	property_set_id = ''
+# 	property_name = '0x00008A02'
 
 if __name__ == '__main__':
 	main()

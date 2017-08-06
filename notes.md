@@ -1,0 +1,4 @@
+- [MS-OXSHARE](https://msdn.microsoft.com/en-us/library/cc433485(v=EXCHG.80).aspx)
+- [Exchange server trial](https://www.microsoft.com/en-us/evalcenter/evaluate-exchange-server-2013)
+- [exchangelib extended properties](https://github.com/ecederstrand/exchangelib)
+- 
