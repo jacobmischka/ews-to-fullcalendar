@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "266263a71ac4173aa5f73b0f4ecf9ce74f5a12c52376058390497a554ba1bdac"
+            "sha256": "ff5ef2d6d63adaeddec764b0425edbc2cfd07bfdadbc474aa232e8675e181cce"
         },
         "requires": {},
         "sources": [
@@ -18,8 +18,23 @@
         "exchangelib": {
             "git": "https://github.com/ecederstrand/exchangelib.git"
         },
+        "flask": {
+            "version": "==0.12.2"
+        },
+        "itsdangerous": {
+            "version": "==0.24"
+        },
+        "jinja2": {
+            "version": "==2.9.6"
+        },
+        "markupsafe": {
+            "version": "==1.0"
+        },
         "python-dotenv": {
             "version": "==0.6.5"
+        },
+        "werkzeug": {
+            "version": "==0.12.2"
         }
     },
     "develop": {

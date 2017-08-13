@@ -8,6 +8,7 @@ pylint = "*"
 [packages]
 python-dotenv = "*"
 flask = "*"
+appdirs = "*"
 
 [packages.exchangelib]
 git = "https://github.com/ecederstrand/exchangelib.git"

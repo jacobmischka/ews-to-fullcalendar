@@ -5,25 +5,41 @@ from fullcalendar_event import FullCalendarEvent
 from exchangelib import (DELEGATE, ServiceAccount, Account, Configuration,
 	CalendarItem)
 from dotenv import load_dotenv, find_dotenv
+from appdirs import user_cache_dir
 
 from argparse import ArgumentParser
-import os, json, sys
+import os, json, sys, sqlite3
+
+APP_NAME = 'ews-to-fullcalendar'
+AUTHOR_NAME = 'jacobmischka'
+
+CACHE_DIR = user_cache_dir(APP_NAME, AUTHOR_NAME)
+CACHE_FILENAME = 'ews-event-cache.db'
+
+try:
+	load_dotenv(find_dotenv())
+except Exception:
+	pass
+
+USERNAME = os.environ.get('EWS_USERNAME')
+PASSWORD = os.environ.get('EWS_PASSWORD')
+EMAIL = os.environ.get('EWS_EMAIL')
+SERVER = os.environ.get('EWS_SERVER')
+EVENT_CACHE_PATH = os.environ.get('EWS_CACHE', os.path.join(CACHE_DIR, CACHE_FILENAME))
 
 def get_account():
-	try:
-		load_dotenv(find_dotenv())
-	except Exception:
-		pass
-
-	USERNAME = os.environ.get('EWS_USERNAME')
-	PASSWORD = os.environ.get('EWS_PASSWORD')
-	EMAIL = os.environ.get('EWS_EMAIL')
-	SERVER = os.environ.get('EWS_SERVER')
-
 	credentials = ServiceAccount(username=USERNAME, password=PASSWORD)
 	config = Configuration(server=SERVER, credentials=credentials)
 	return Account(primary_smtp_address=EMAIL, config=config,
 		autodiscover=False, access_type=DELEGATE)
+
+def get_cache():
+	os.makedirs(os.path.dirname(EVENT_CACHE_PATH), exist_ok=True)
+	return sqlite3.connect(EVENT_CACHE_PATH)
+
+def save_events_to_cache(account):
+	with get_cache() as cache:
+		pass
 
 def get_all_fc_events(account):
 	return get_fc_events(account.calendar.all())
