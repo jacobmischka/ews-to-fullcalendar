@@ -1,118 +1,48 @@
 {
     "_meta": {
+        "hash": {
+            "sha256": "266263a71ac4173aa5f73b0f4ecf9ce74f5a12c52376058390497a554ba1bdac"
+        },
+        "requires": {},
         "sources": [
             {
                 "url": "https://pypi.python.org/simple",
                 "verify_ssl": true
             }
-        ],
-        "requires": {},
-        "hash": {
-            "sha256": "7bd601c9b5412cf3a2819fed25845b331877efc46f64ede6e8f72bd1ae052138"
-        }
+        ]
     },
     "default": {
         "click": {
-            "hash": "sha256:29f99fc6125fbc931b758dc053b3114e55c77a6e4c6c3a2674a2dc986016381d",
             "version": "==6.7"
         },
-        "ordereddict": {
-            "hash": "sha256:1c35b4ac206cef2d24816c89f89cf289dd3d38cf7c449bb3fab7bf6d43f01b1f",
-            "version": "==1.1"
-        },
-        "requests": {
-            "hash": "sha256:b62be4ec5999c24d10c98d248a136e7db20ca6616a2b65060cd9399417331e8a",
-            "version": "==2.18.3"
-        },
         "exchangelib": {
-            "hash": "sha256:a0a5c5bfd1822c54570784cb5a95f140a9f9c76ac2cbb91544576d963c8c3101",
-            "version": "==1.9.4"
-        },
-        "dnspython": {
-            "hash": "sha256:861e6e58faa730f9845aaaa9c6c832851fbf89382ac52915a51f89c71accdd31",
-            "version": "==1.15.0"
-        },
-        "future": {
-            "hash": "sha256:e39ced1ab767b5936646cedba8bcce582398233d6a627067d4c6a454c90cfedb",
-            "version": "==0.16.0"
-        },
-        "requests-ntlm": {
-            "hash": "sha256:3bf27f1e1a28213b926ef5f09c85b96de2285632ee1389a237e657768aae6620",
-            "version": "==1.0.0"
-        },
-        "idna": {
-            "hash": "sha256:cc19709fd6d0cbfed39ea875d29ba6d4e22c0cebc510a76d6302a28385e8bb70",
-            "version": "==2.5"
-        },
-        "tzlocal": {
-            "hash": "sha256:05a2908f7fb1ba8843f03b2360d6ad314dbf2bce4644feb702ccd38527e13059",
-            "version": "==1.4"
-        },
-        "urllib3": {
-            "hash": "sha256:06330f386d6e4b195fbfc736b297f58c5a892e4440e54d294d7004e3a9bbea1b",
-            "version": "==1.22"
-        },
-        "cached-property": {
-            "hash": "sha256:8aacd79aa85a793419c76de9662d9a72ad4751eda2a8b8eb94223adc4d8d85f1",
-            "version": "==1.3.0"
-        },
-        "pytz": {
-            "hash": "sha256:d1d6729c85acea5423671382868627129432fba9a89ecbb248d8d1c7a9f01c67",
-            "version": "==2017.2"
-        },
-        "certifi": {
-            "hash": "sha256:54a07c09c586b0e4c619f02a5e94e36619da8e2b053e20f594348c0611803704",
-            "version": "==2017.7.27.1"
-        },
-        "lxml": {
-            "hash": "sha256:9374c9399c1d8479b2b93295abf5997ebaa6d9c5e21a3dc03d1c18b61247cfae",
-            "version": "==3.8.0"
-        },
-        "six": {
-            "hash": "sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1",
-            "version": "==1.10.0"
+            "git": "https://github.com/ecederstrand/exchangelib.git"
         },
         "python-dotenv": {
-            "hash": "sha256:bac21323df7ab51765948442392872e0ad89cc5c9122ab7f41bd8ad689fc7c72",
-            "version": "==0.6.4"
-        },
-        "chardet": {
-            "hash": "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691",
-            "version": "==3.0.4"
-        },
-        "ntlm-auth": {
-            "hash": "sha256:42998e8915ef26a9d4112e4dd7e97382faf1ffb07f2da12490af83a5bb0b1355",
-            "version": "==1.0.5"
+            "version": "==0.6.5"
         }
     },
     "develop": {
-        "pylint": {
-            "hash": "sha256:c7a3ee11db42d00334671b778f042793c837b73f5883132158284b7dbd6f8184",
-            "version": "==1.7.2"
-        },
-        "isort": {
-            "hash": "sha256:cd5d3fc2c16006b567a17193edf4ed9830d9454cbeb5a42ac80b36ea00c23db4",
-            "version": "==4.2.15"
-        },
         "astroid": {
-            "hash": "sha256:39a21dd2b5d81a6731dc0ac2884fa419532dffd465cdd43ea6c168d36b76efb3",
             "version": "==1.5.3"
         },
-        "wrapt": {
-            "hash": "sha256:42160c91b77f1bc64a955890038e02f2f72986c01d462d53cb6cb039b995cdd9",
-            "version": "==1.10.10"
-        },
-        "mccabe": {
-            "hash": "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42",
-            "version": "==0.6.1"
-        },
-        "six": {
-            "hash": "sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1",
-            "version": "==1.10.0"
+        "isort": {
+            "version": "==4.2.15"
         },
         "lazy-object-proxy": {
-            "hash": "sha256:e34b155e36fa9da7e1b7c738ed7767fc9491a62ec6af70fe9da4a057759edc2d",
             "version": "==1.3.1"
+        },
+        "mccabe": {
+            "version": "==0.6.1"
+        },
+        "pylint": {
+            "version": "==1.7.2"
+        },
+        "six": {
+            "version": "==1.10.0"
+        },
+        "wrapt": {
+            "version": "==1.10.11"
         }
     }
 }

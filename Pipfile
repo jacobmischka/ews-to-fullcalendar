@@ -6,5 +6,5 @@ verify_ssl = true
 pylint = "*"
 
 [packages]
-exchangelib = "*"
+exchangelib = { git='https://github.com/ecederstrand/exchangelib.git' }
 python-dotenv = "*"

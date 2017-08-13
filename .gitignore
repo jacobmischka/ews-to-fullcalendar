@@ -2,6 +2,7 @@ __pycache__/
 .venv/
 lib/
 bin/
+output/
 
 .env
 .env.sh
