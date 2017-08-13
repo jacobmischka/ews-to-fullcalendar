@@ -1,0 +1,12 @@
+{
+  "name": "ews-to-fullcalendar",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:jacobmischka/ews-to-fullcalendar.git",
+  "author": "Jacob Mischka <jacob@mischka.me>",
+  "license": "MIT",
+  "scripts": {
+    "serve": "FLASK_APP=app.py flask run",
+    "deploy": "now --docker"
+  }
+}

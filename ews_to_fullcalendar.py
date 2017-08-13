@@ -25,14 +25,25 @@ def get_account():
 	return Account(primary_smtp_address=EMAIL, config=config,
 		autodiscover=False, access_type=DELEGATE)
 
-def get_fc_events(account):
+def get_all_fc_events(account):
+	return get_fc_events(account.calendar.all())
+
+def get_fc_events_between(account, start, end):
+	return get_fc_events(account.calendar.view(
+		start=start,
+		end=end
+	))
+
+def get_fc_events(qs):
 	fc_events = []
-	for event in account.calendar.all():
+	for event in qs:
 		if type(event) is CalendarItem:
 			try:
 				fc_events.append(FullCalendarEvent.from_ews_event(event))
 			except Exception as e:
-				print('Failed to convert EWS event to FullCalendar event: {}'.format(e), sys.stderr)
+				print('Failed to convert EWS event to FullCalendar event: {}'.format(e), file=sys.stderr)
+		else:
+			print('Event is not EWS CalendarItem, skipping', file=sys.stderr)
 
 	return fc_events
 
@@ -49,7 +60,7 @@ def main():
 	args = parser.parse_args()
 
 	account = get_account()
-	fc_events = get_fc_events(account)
+	fc_events = get_all_fc_events(account)
 
 	write_events([event.to_dict() for event in fc_events], args.outpath)
 
