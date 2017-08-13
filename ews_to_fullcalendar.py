@@ -47,6 +47,22 @@ def get_fc_events(qs):
 
 	return fc_events
 
+def get_ical_events(qs):
+	ical_events = []
+	for event in qs:
+		if type(event) is CalendarItem:
+			try:
+				ical_events.append(strip_windows_newlines(event.mime_content.decode('utf-8')))
+			except Exception as e:
+				print('Failed to get MIME content from event: {}'.format(e), file=sys.stderr)
+		else:
+			print('Event is not EWS CalendarItem, skipping', file=sys.stderr)
+
+	return ical_events
+
+def strip_windows_newlines(s):
+	return s.replace('\r', '')
+
 def write_events(events, outpath=None):
 	if outpath:
 		with open(outpath, 'w') as outfile:
