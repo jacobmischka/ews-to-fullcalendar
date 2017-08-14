@@ -4,8 +4,8 @@
 
 from flask import Flask, request
 
-from ews_to_fullcalendar import (get_account, get_fc_events_between, get_all_fc_events,
-	get_ical_events)
+from ews_to_fullcalendar import (get_cache, get_all_cached_fc_events,
+	get_cached_fc_events_between, get_ical_events)
 from fullcalendar_event import FullCalendarEvent
 
 from exchangelib import EWSDateTime, EWSTimeZone
@@ -21,15 +21,11 @@ def fullcalendar():
 	start = request.args.get('start', None)
 	end = request.args.get('end', None)
 
-	account = get_account()
-
-	if start and end:
-		ews_start = tz.localize(EWSDateTime.strptime(start, '%Y-%m-%d'))
-		ews_end = tz.localize(EWSDateTime.strptime(end, '%Y-%m-%d'))
-
-		events = get_fc_events_between(account, ews_start, ews_end)
-	else:
-		events = get_all_fc_events(account)
+	with get_cache() as cache:
+		if start and end:
+			events = get_cached_fc_events_between(cache, start, end)
+		else:
+			events = get_all_cached_fc_events(cache)
 
 	return (
 		json.dumps([event.to_dict() for event in events], indent='\t'),

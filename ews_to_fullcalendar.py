@@ -8,7 +8,7 @@ from dotenv import load_dotenv, find_dotenv
 from appdirs import user_cache_dir
 
 from argparse import ArgumentParser
-import os, json, sys, sqlite3
+import os, json, sys, sqlite3, pickle
 
 APP_NAME = 'ews-to-fullcalendar'
 AUTHOR_NAME = 'jacobmischka'
@@ -35,11 +35,35 @@ def get_account():
 
 def get_cache():
 	os.makedirs(os.path.dirname(EVENT_CACHE_PATH), exist_ok=True)
-	return sqlite3.connect(EVENT_CACHE_PATH)
+	conn = sqlite3.connect(EVENT_CACHE_PATH)
+	conn.execute('''
+		CREATE TABLE IF NOT EXISTS events (
+			id text PRIMARY KEY,
+			title text,
+			start text,
+			end text,
+			event blob
+		)
+	''')
+	conn.commit()
+	return conn
 
-def save_events_to_cache(account):
-	with get_cache() as cache:
-		pass
+def upsert_event(cache, event):
+	cache.execute('''
+		INSERT OR REPLACE INTO events(id, title, start, end, event)
+		VALUES (?, ?, ?, ?, ?)
+	''', (event.id, event.title, event.start, event.end, pickle.dumps(event)))
+
+def save_events_to_cache(account, cache):
+	for fc_event in get_all_fc_events(account):
+		upsert_event(cache, fc_event)
+
+def get_all_cached_fc_events(cache):
+	return [pickle.loads(event[0]) for event in cache.execute('SELECT event FROM events')]
+
+def get_cached_fc_events_between(cache, start, end):
+	return [pickle.loads(event[0]) for event in cache.execute(
+		'SELECT event FROM events WHERE start <= ? AND end >= ?', (end, start))]
 
 def get_all_fc_events(account):
 	return get_fc_events(account.calendar.all())
@@ -50,9 +74,9 @@ def get_fc_events_between(account, start, end):
 		end=end
 	))
 
-def get_fc_events(qs):
+def get_fc_events(events):
 	fc_events = []
-	for event in qs:
+	for event in events:
 		if type(event) is CalendarItem:
 			try:
 				fc_events.append(FullCalendarEvent.from_ews_event(event))
@@ -92,7 +116,9 @@ def main():
 	args = parser.parse_args()
 
 	account = get_account()
-	fc_events = get_all_fc_events(account)
+	with get_cache() as cache:
+		save_events_to_cache(account, cache)
+		fc_events = get_all_cached_fc_events(cache)
 
 	write_events([event.to_dict() for event in fc_events], args.outpath)
 

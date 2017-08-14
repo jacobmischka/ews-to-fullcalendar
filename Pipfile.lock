@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ff5ef2d6d63adaeddec764b0425edbc2cfd07bfdadbc474aa232e8675e181cce"
+            "sha256": "036242453b0254ed620eeafe89b9e054865b77ce3f0bc7814ec5ce41441ba44a"
         },
         "requires": {},
         "sources": [
@@ -12,6 +12,9 @@
         ]
     },
     "default": {
+        "appdirs": {
+            "version": "==1.4.3"
+        },
         "click": {
             "version": "==6.7"
         },
