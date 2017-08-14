@@ -4,13 +4,13 @@
 
 from flask import Flask, request
 
-from ews_to_fullcalendar import (get_cache, get_all_cached_fc_events,
-	get_cached_fc_events_between, get_all_cached_ical_events)
+from ews_to_fullcalendar import (get_all_cached_fc_events,
+	get_cached_fc_events_between, get_saved_ical)
 from fullcalendar_event import FullCalendarEvent
 
 from exchangelib import EWSDateTime, EWSTimeZone
 
-import json
+import json, textwrap
 
 app = Flask(__name__)
 
@@ -21,11 +21,10 @@ def fullcalendar():
 	start = request.args.get('start', None)
 	end = request.args.get('end', None)
 
-	with get_cache() as cache:
-		if start and end:
-			events = get_cached_fc_events_between(cache, start, end)
-		else:
-			events = get_all_cached_fc_events(cache)
+	if start and end:
+		events = get_cached_fc_events_between(start, end)
+	else:
+		events = get_all_cached_fc_events()
 
 	return (
 		json.dumps([event.to_dict() for event in events], indent='\t'),
@@ -37,11 +36,8 @@ def fullcalendar():
 
 @app.route('/ical.ics')
 def ical():
-	with get_cache() as cache:
-		ics_events = get_all_cached_ical_events(cache)
-
 	return (
-		'\n'.join(ics_events),
+		get_saved_ical(),
 		{
 			'Content-Type': 'text/calendar',
 			'Access-Control-Allow-Origin': '*'

@@ -15,6 +15,7 @@ AUTHOR_NAME = 'jacobmischka'
 
 CACHE_DIR = user_cache_dir(APP_NAME, AUTHOR_NAME)
 CACHE_FILENAME = 'ews-event-cache.db'
+ICAL_CACHE_FILENAME = 'ical.ics'
 
 try:
 	load_dotenv(find_dotenv())
@@ -26,6 +27,7 @@ PASSWORD = os.environ.get('EWS_PASSWORD')
 EMAIL = os.environ.get('EWS_EMAIL')
 SERVER = os.environ.get('EWS_SERVER')
 EVENT_CACHE_PATH = os.environ.get('EWS_CACHE', os.path.join(CACHE_DIR, CACHE_FILENAME))
+ICAL_CACHE_PATH = os.environ.get('EWS_ICAL_CACHE', os.path.join(CACHE_DIR, ICAL_CACHE_FILENAME))
 
 def get_account():
 	credentials = ServiceAccount(username=USERNAME, password=PASSWORD)
@@ -54,16 +56,54 @@ def upsert_event(cache, event):
 		VALUES (?, ?, ?, ?, ?)
 	''', (event.id, event.title, event.start, event.end, pickle.dumps(event)))
 
-def save_events_to_cache(account, cache):
-	for fc_event in get_all_fc_events(account):
+def sync_events(account):
+	events = [event for event in account.calendar.all() if type(event) is CalendarItem]
+
+	with get_cache() as cache:
+		save_events_to_cache(events, cache)
+
+	save_ical(events)
+
+def save_events_to_cache(events, cache):
+	for fc_event in get_fc_events(events):
 		upsert_event(cache, fc_event)
 
-def get_all_cached_fc_events(cache):
-	return [pickle.loads(event[0]) for event in cache.execute('SELECT event FROM events')]
+def save_ical(events):
+	ics_events = [clean_mime_content(event.mime_content) for event in events]
 
-def get_cached_fc_events_between(cache, start, end):
-	return [pickle.loads(event[0]) for event in cache.execute(
-		'SELECT event FROM events WHERE start <= ? AND end >= ?', (end, start))]
+	PRODID = '-//Jacob Mischka//EWS to FullCalendar//EN'
+
+	calname = 'TODO'
+	caldesc = 'TODO'
+	timezone = 'America/Chicago'
+
+	ical = '''\
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:{}
+X-WR-CALNAME:{}
+X-WR-CALDESC:{}
+X-WR-TIMEZONE:{}
+{}
+END:VCALENDAR'''.format(
+		PRODID,
+		calname,
+		caldesc,
+		timezone,
+		'\n'.join(ics_events)
+	)
+
+	with open(ICAL_CACHE_PATH, 'w') as ical_file:
+		ical_file.write(ical)
+
+def get_all_cached_fc_events():
+	with get_cache() as cache:
+		return [pickle.loads(event[0]) for event in cache.execute('SELECT event FROM events')]
+
+def get_cached_fc_events_between(start, end):
+	with get_cache() as cache:
+		return [pickle.loads(event[0]) for event in cache.execute(
+			'SELECT event FROM events WHERE start <= ? AND end >= ?', (end, start))]
 
 def get_all_fc_events(account):
 	return get_fc_events(account.calendar.all())
@@ -92,24 +132,19 @@ def get_fc_event(event):
 	else:
 		print('Event is not EWS CalendarItem, skipping', file=sys.stderr)
 
-def get_ical_events(events):
-	ical_events = []
-	for event in events:
-		if type(event) is CalendarItem:
-			try:
-				ical_events.append(strip_windows_newlines(event.mime_content.decode('utf-8')))
-			except Exception as e:
-				print('Failed to get MIME content from event: {}'.format(e), file=sys.stderr)
-		else:
-			print('Event is not EWS CalendarItem, skipping', file=sys.stderr)
+def get_saved_ical():
+	with open(ICAL_CACHE_PATH, 'r') as ical_file:
+		return ical_file.read()
 
-	return ical_events
+def clean_mime_content(mime):
+	content = mime.decode('utf-8').replace('\r', '')
+	BEGIN = 'BEGIN:VEVENT'
+	END = 'END:VEVENT'
 
-def get_all_cached_ical_events(cache):
-	return [event.mime for event in get_all_cached_fc_events(cache)]
+	start = content.find(BEGIN)
+	end = content.find(END) + len(END)
 
-def strip_windows_newlines(s):
-	return s.replace('\r', '')
+	return content[start:end].strip()
 
 def write_events(events, outpath=None):
 	if outpath:
@@ -125,13 +160,12 @@ def main():
 	parser.add_argument('-q', '--quiet', action='store_true', help="Don't output events (to be used with --sync)", dest='quiet')
 	args = parser.parse_args()
 
-	with get_cache() as cache:
-		if args.sync:
-			save_events_to_cache(get_account(), cache)
+	if args.sync:
+		sync_events(get_account())
 
-		if not args.quiet:
-			fc_events = get_all_cached_fc_events(cache)
-			write_events([event.to_dict() for event in fc_events], args.outpath)
+	if not args.quiet:
+		fc_events = get_all_cached_fc_events()
+		write_events([event.to_dict() for event in fc_events], args.outpath)
 
 
 if __name__ == '__main__':
