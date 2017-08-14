@@ -5,7 +5,7 @@
 from flask import Flask, request
 
 from ews_to_fullcalendar import (get_cache, get_all_cached_fc_events,
-	get_cached_fc_events_between, get_ical_events)
+	get_cached_fc_events_between, get_all_cached_ical_events)
 from fullcalendar_event import FullCalendarEvent
 
 from exchangelib import EWSDateTime, EWSTimeZone
@@ -37,8 +37,8 @@ def fullcalendar():
 
 @app.route('/ical.ics')
 def ical():
-	account = get_account()
-	ics_events = get_ical_events(account.calendar.all())
+	with get_cache() as cache:
+		ics_events = get_all_cached_ical_events(cache)
 
 	return (
 		'\n'.join(ics_events),
@@ -50,4 +50,4 @@ def ical():
 
 
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', debug=True, port=80)
+	app.run(host='0.0.0.0', port=80, debug=True)

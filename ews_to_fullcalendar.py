@@ -77,19 +77,24 @@ def get_fc_events_between(account, start, end):
 def get_fc_events(events):
 	fc_events = []
 	for event in events:
-		if type(event) is CalendarItem:
-			try:
-				fc_events.append(FullCalendarEvent.from_ews_event(event))
-			except Exception as e:
-				print('Failed to convert EWS event to FullCalendar event: {}'.format(e), file=sys.stderr)
-		else:
-			print('Event is not EWS CalendarItem, skipping', file=sys.stderr)
+		fc_event = get_fc_event(event)
+		if fc_event:
+			fc_events.append(fc_event)
 
 	return fc_events
 
-def get_ical_events(qs):
+def get_fc_event(event):
+	if type(event) is CalendarItem:
+		try:
+			return FullCalendarEvent.from_ews_event(event)
+		except Exception as e:
+			print('Failed to convert EWS event to FullCalendar event: {}'.format(e), file=sys.stderr)
+	else:
+		print('Event is not EWS CalendarItem, skipping', file=sys.stderr)
+
+def get_ical_events(events):
 	ical_events = []
-	for event in qs:
+	for event in events:
 		if type(event) is CalendarItem:
 			try:
 				ical_events.append(strip_windows_newlines(event.mime_content.decode('utf-8')))
@@ -99,6 +104,9 @@ def get_ical_events(qs):
 			print('Event is not EWS CalendarItem, skipping', file=sys.stderr)
 
 	return ical_events
+
+def get_all_cached_ical_events(cache):
+	return [event.mime for event in get_all_cached_fc_events(cache)]
 
 def strip_windows_newlines(s):
 	return s.replace('\r', '')
@@ -113,14 +121,17 @@ def write_events(events, outpath=None):
 def main():
 	parser = ArgumentParser(description='Outputs all calendar events as FullCalendar events')
 	parser.add_argument('-o', help='Output file path (default stdout)', dest='outpath', required=False, default=None)
+	parser.add_argument('-s', '--sync', action='store_true', help='Save calendar events to local cache, output nothing', dest='sync')
+	parser.add_argument('-q', '--quiet', action='store_true', help="Don't output events (to be used with --sync)", dest='quiet')
 	args = parser.parse_args()
 
-	account = get_account()
 	with get_cache() as cache:
-		save_events_to_cache(account, cache)
-		fc_events = get_all_cached_fc_events(cache)
+		if args.sync:
+			save_events_to_cache(get_account(), cache)
 
-	write_events([event.to_dict() for event in fc_events], args.outpath)
+		if not args.quiet:
+			fc_events = get_all_cached_fc_events(cache)
+			write_events([event.to_dict() for event in fc_events], args.outpath)
 
 
 if __name__ == '__main__':

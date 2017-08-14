@@ -5,7 +5,8 @@ class FullCalendarEvent(object):
 		'end',
 		'url',
 		'location',
-		'description'
+		'description',
+		'mime'
 	]
 
 	dict_keys = {
@@ -33,7 +34,8 @@ class FullCalendarEvent(object):
 			end=event.end.isoformat(),
 			all_day=event.is_all_day,
 			location=event.location,
-			description=description
+			description=description,
+			mime=event.mime_content.decode('utf-8').replace('\r', '')
 		)
 
 	def to_dict(self):
