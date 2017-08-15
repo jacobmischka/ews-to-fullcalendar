@@ -1,3 +1,11 @@
+from exchangelib import EWSTimeZone
+
+import os, tzlocal
+
+TIMEZONE = os.environ.get('EWS_TIMEZONE', tzlocal.get_localzone().zone)
+
+TZ = EWSTimeZone.timezone(TIMEZONE)
+
 class FullCalendarEvent(object):
 	optional_props = [
 		'id',
@@ -29,8 +37,8 @@ class FullCalendarEvent(object):
 		return cls(
 			id=event.item_id,
 			title=event.subject,
-			start=event.start.isoformat(),
-			end=event.end.isoformat(),
+			start=event.start.astimezone(TZ).isoformat(),
+			end=event.end.astimezone(TZ).isoformat(),
 			all_day=event.is_all_day,
 			location=event.location,
 			description=description
