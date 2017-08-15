@@ -6,15 +6,17 @@ from flask import Flask, request
 
 from ews_to_fullcalendar import (get_all_cached_fc_events,
 	get_cached_fc_events_between, get_saved_ical)
-from fullcalendar_event import FullCalendarEvent
 
-from exchangelib import EWSDateTime, EWSTimeZone
+from exchangelib import EWSTimeZone
 
-import json, textwrap
+import json, os, tzlocal
+
+TIMEZONE = os.environ.get('EWS_TIMEZONE', tzlocal.get_localzone().zone)
+ALLOWED_ORIGIN = os.environ.get('EWS_ALLOWED_ORIGIN', '*')
 
 app = Flask(__name__)
 
-tz = EWSTimeZone.timezone('America/Chicago')
+tz = EWSTimeZone.timezone(TIMEZONE)
 
 @app.route('/fullcalendar')
 def fullcalendar():
@@ -30,7 +32,7 @@ def fullcalendar():
 		json.dumps([event.to_dict() for event in events], indent='\t'),
 		{
 			'Content-Type': 'application/json',
-			'Access-Control-Allow-Origin': '*'
+			'Access-Control-Allow-Origin': ALLOWED_ORIGIN
 		}
 	)
 
@@ -40,7 +42,7 @@ def ical():
 		get_saved_ical(),
 		{
 			'Content-Type': 'text/calendar',
-			'Access-Control-Allow-Origin': '*'
+			'Access-Control-Allow-Origin': ALLOWED_ORIGIN
 		}
 	)
 
