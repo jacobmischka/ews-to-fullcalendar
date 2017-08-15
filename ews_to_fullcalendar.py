@@ -158,7 +158,7 @@ def main():
 	parser = ArgumentParser(description='Outputs all calendar events as FullCalendar events')
 	parser.add_argument('-o', help='Output file path (default stdout)', dest='outpath', required=False, default=None)
 	parser.add_argument('-i', '--ical', '--ics', action='store_true', help='Get .ics instead', dest='ics')
-	parser.add_argument('-s', '--sync', action='store_true', help='Save calendar events to local cache, output nothing', dest='sync')
+	parser.add_argument('-s', '--sync', action='store_true', help='Save calendar events to local cache', dest='sync')
 	parser.add_argument('-q', '--quiet', action='store_true', help="Don't output events (to be used with --sync)", dest='quiet')
 	args = parser.parse_args()
 
