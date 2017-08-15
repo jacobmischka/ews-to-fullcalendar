@@ -37,7 +37,7 @@ optional arguments:
 
 Intended to be used for [ics-merger][ics-merger] but should work for any FullCalendar or iCalendar consumer.
 
-Serves events from local cache, which is updated hourly by default (see `crontabs/root`).
+Serves events from local cache, which is updated every 3 hours by default (see `crontabs/root`).
 
 ### Library
 
