@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "bb1c5a42228d4492120f71d475195ad3449c848d2ad09f8e2e0fe391d25104af"
+            "sha256": "4da02bc8764e233d732784b2b9d77bb9373c7cd0fd2d2bf1384b1bac041e99b6"
         },
         "requires": {},
         "sources": [
@@ -35,6 +35,12 @@
         },
         "python-dotenv": {
             "version": "==0.6.5"
+        },
+        "pytz": {
+            "version": "==2017.2"
+        },
+        "tzlocal": {
+            "version": "==1.4"
         },
         "werkzeug": {
             "version": "==0.12.2"

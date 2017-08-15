@@ -9,6 +9,7 @@ pylint = "*"
 python-dotenv = "*"
 appdirs = "*"
 Flask = "*"
+tzlocal = "*"
 
 [packages.exchangelib]
 git = "https://github.com/ecederstrand/exchangelib.git"

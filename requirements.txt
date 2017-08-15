@@ -5,6 +5,8 @@ itsdangerous==0.24
 jinja2==2.9.6
 markupsafe==1.0
 python-dotenv==0.6.5
+pytz==2017.2
+tzlocal==1.4
 werkzeug==0.12.2
 astroid==1.5.3
 isort==4.2.15

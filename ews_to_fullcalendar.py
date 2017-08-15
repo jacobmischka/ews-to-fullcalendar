@@ -8,7 +8,9 @@ from dotenv import load_dotenv, find_dotenv
 from appdirs import user_cache_dir
 
 from argparse import ArgumentParser
-import os, json, sys, sqlite3, pickle
+import os, json, sys, sqlite3, pickle, tzlocal
+
+PRODID = '-//Jacob Mischka//EWS to FullCalendar//EN'
 
 APP_NAME = 'ews-to-fullcalendar'
 AUTHOR_NAME = 'jacobmischka'
@@ -26,6 +28,11 @@ USERNAME = os.environ.get('EWS_USERNAME')
 PASSWORD = os.environ.get('EWS_PASSWORD')
 EMAIL = os.environ.get('EWS_EMAIL')
 SERVER = os.environ.get('EWS_SERVER')
+
+CALNAME = os.environ.get('EWS_CALNAME', 'Calendar')
+CALDESC = os.environ.get('EWS_CALDESC', '')
+TIMEZONE = os.environ.get('EWS_TIMEZONE', tzlocal.get_localzone().zone)
+
 EVENT_CACHE_PATH = os.environ.get('EWS_CACHE', os.path.join(CACHE_DIR, CACHE_FILENAME))
 ICAL_CACHE_PATH = os.environ.get('EWS_ICAL_CACHE', os.path.join(CACHE_DIR, ICAL_CACHE_FILENAME))
 
@@ -71,12 +78,6 @@ def save_events_to_cache(events, cache):
 def save_ical(events):
 	ics_events = [clean_mime_content(event.mime_content) for event in events]
 
-	PRODID = '-//Jacob Mischka//EWS to FullCalendar//EN'
-
-	calname = 'TODO'
-	caldesc = 'TODO'
-	timezone = 'America/Chicago'
-
 	ical = '''\
 BEGIN:VCALENDAR
 VERSION:2.0
@@ -87,9 +88,9 @@ X-WR-TIMEZONE:{}
 {}
 END:VCALENDAR'''.format(
 		PRODID,
-		calname,
-		caldesc,
-		timezone,
+		CALNAME,
+		CALDESC,
+		TIMEZONE,
 		'\n'.join(ics_events)
 	)
 
@@ -156,6 +157,7 @@ def write_events(events, outpath=None):
 def main():
 	parser = ArgumentParser(description='Outputs all calendar events as FullCalendar events')
 	parser.add_argument('-o', help='Output file path (default stdout)', dest='outpath', required=False, default=None)
+	parser.add_argument('-i', '--ical', '--ics', action='store_true', help='Get .ics instead', dest='ics')
 	parser.add_argument('-s', '--sync', action='store_true', help='Save calendar events to local cache, output nothing', dest='sync')
 	parser.add_argument('-q', '--quiet', action='store_true', help="Don't output events (to be used with --sync)", dest='quiet')
 	args = parser.parse_args()
@@ -164,8 +166,15 @@ def main():
 		sync_events(get_account())
 
 	if not args.quiet:
-		fc_events = get_all_cached_fc_events()
-		write_events([event.to_dict() for event in fc_events], args.outpath)
+		if args.ics:
+			if args.outpath:
+				with open(args.outpath, 'w') as outfile:
+					outfile.write(get_saved_ical())
+			else:
+				sys.stdout.write(get_saved_ical())
+		else:
+			fc_events = get_all_cached_fc_events()
+			write_events([event.to_dict() for event in fc_events], args.outpath)
 
 
 if __name__ == '__main__':
