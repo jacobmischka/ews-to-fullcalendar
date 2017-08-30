@@ -75,6 +75,8 @@ def save_events_to_cache(events, cache):
 	for fc_event in get_fc_events(events):
 		upsert_event(cache, fc_event)
 
+	cache.commit()
+
 def save_ical(events):
 	ics_events = [clean_mime_content(event.mime_content) for event in events]
 
