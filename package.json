@@ -8,6 +8,7 @@
   "scripts": {
     "serve": "FLASK_APP=app.py flask run",
     "deploy": "now --docker --dotenv",
+    "requirements": "pipenv lock --requirements | sed -e '/lxml/d' -e '/cffi/d' -e '/cryptography/d' > requirements.txt",
     "docker:build": "sudo docker build -t ews-to-fullcalendar .",
     "docker:run": "sudo docker run --env-file .env -p 7000:80 --name ews --rm ews-to-fullcalendar",
     "docker:stop": "sudo docker stop ews"

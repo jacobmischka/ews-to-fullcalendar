@@ -1,6 +1,6 @@
 FROM jazzdd/alpine-flask:python3
 
-RUN apk add --no-cache py3-lxml
+RUN apk add --no-cache py3-lxml py3-cffi py3-cryptography
 
 COPY fullcalendar_event.py /app
 COPY ews_to_fullcalendar.py /app
