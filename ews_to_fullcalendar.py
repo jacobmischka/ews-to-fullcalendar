@@ -10,6 +10,9 @@ from appdirs import user_cache_dir
 from argparse import ArgumentParser
 import os, json, sys, sqlite3, pickle, tzlocal
 
+from exchangelib.protocol import BaseProtocol, NoVerifyHTTPAdapter
+import urllib3
+
 PRODID = '-//Jacob Mischka//EWS to FullCalendar//EN'
 
 APP_NAME = 'ews-to-fullcalendar'
@@ -162,7 +165,13 @@ def main():
 	parser.add_argument('-i', '--ical', '--ics', action='store_true', help='Get .ics instead', dest='ics')
 	parser.add_argument('-s', '--sync', action='store_true', help='Save calendar events to local cache', dest='sync')
 	parser.add_argument('-q', '--quiet', action='store_true', help="Don't output events (to be used with --sync)", dest='quiet')
+	parser.add_argument('--nossl', action='store_true', help='Irgnore SSL errors when connecting to EWS.')
 	args = parser.parse_args()
+
+	if args.nossl:
+		BaseProtocol.HTTP_ADAPTER_CLS = NoVerifyHTTPAdapter
+		if args.quiet:
+			urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 	if args.sync:
 		sync_events(get_account())
